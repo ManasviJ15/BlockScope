@@ -13,6 +13,11 @@
 .env.production
 .env.staging
 .env.test
+backend/.env.development
+backend/.env.production
+backend/.env
+frontend/.env
+frontend/.env.production
 
 # Environment variable files
 *.env
