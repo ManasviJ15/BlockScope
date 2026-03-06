@@ -81,6 +81,28 @@ const safeLocalStorageGet = (key, fallback = null) => {
   catch (e) { console.error('localStorage read failed:', e); return fallback; }
 };
 
+const copyToClipboard = async (text) => {
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (_) {}
+  }
+  try {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(textarea);
+    return ok;
+  } catch (_) {
+    return false;
+  }
+};
+
 // ─── SeverityBadge ───────────────────────────────────────────────────────────
 
 const SeverityBadge = ({ severity }) => {
@@ -171,19 +193,15 @@ contract SafeContract {
 
 const FindingCard = ({ finding }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [copySuccess, setCopySuccess] = useState(false);
+  const [copySuccess, setCopySuccess] = useState('idle');
   const copyTimerRef = useRef(null);
   useEffect(() => () => clearTimeout(copyTimerRef.current), []);
 
   const handleCopyToClipboard = async (e) => {
-    e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(finding, null, 2));
-      setCopySuccess(true);
-      copyTimerRef.current = setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy: ', err);
-    }
+  e.stopPropagation();
+  const ok = await copyToClipboard(JSON.stringify(finding, null, 2));
+  setCopyState(ok ? 'success' : 'error');
+  copyTimerRef.current = setTimeout(() => setCopyState('idle'), 2000);
   };
 
   return (
@@ -233,12 +251,12 @@ const FindingCard = ({ finding }) => {
             onClick={handleCopyToClipboard}
             className="p-2 text-gray-500 hover:text-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
             title="Copy finding to clipboard"
-            aria-label={copySuccess ? 'Copied to clipboard' : 'Copy finding to clipboard'}
+            aria-label={copyState === 'success' ? 'Copied!' : copyState === 'error' ? 'Copy failed' : 'Copy finding to clipboard'}
             aria-live="polite"
           >
-            {copySuccess
-              ? <CheckCircle className="w-5 h-5 text-green-600" />
-              : <Copy className="w-5 h-5" />}
+            {copyState === 'success' && <CheckCircle className="w-5 h-5 text-green-600" />}
+            {copyState === 'error'   && <AlertCircle className="w-5 h-5 text-red-500" />}
+            {copyState === 'idle'    && <Copy className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -251,7 +269,7 @@ const FindingCard = ({ finding }) => {
 const ResultsList = ({ findings, loading, contractName }) => {
   const [searchTerm,      setSearchTerm]      = useState('');
   const [filterSeverity,  setFilterSeverity]  = useState('All');
-  const [copyLinkSuccess, setCopyLinkSuccess] = useState(false);
+  const [copyLinkSuccess, setCopyLinkSuccess] = useState('idle');
   const [printError,      setPrintError]      = useState('');
 
   const copyLinkTimerRef = useRef(null);
@@ -282,13 +300,9 @@ const ResultsList = ({ findings, loading, contractName }) => {
     const binStr  = Array.from(bytes, (b) => String.fromCodePoint(b)).join('');
     const encoded = btoa(binStr);
     const shareableLink = `${window.location.origin}/share?data=${encodeURIComponent(encoded)}`;
-    try {
-      await navigator.clipboard.writeText(shareableLink);
-      setCopyLinkSuccess(true);
-      copyLinkTimerRef.current = setTimeout(() => setCopyLinkSuccess(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy link: ', err);
-    }
+    const ok = await copyToClipboard(shareableLink);
+    setCopyLinkState(ok ? 'success' : 'error');
+    copyLinkTimerRef.current = setTimeout(() => setCopyLinkState('idle'), 2000);
   };
 
   const handlePrint = () => {
@@ -394,9 +408,11 @@ const ResultsList = ({ findings, loading, contractName }) => {
             onClick={handleCopyShareableLink}
             className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
             title="Copy Shareable Link"
-            aria-label={copyLinkSuccess ? 'Link copied!' : 'Copy shareable link'}
+            aria-label={copyLinkState === 'success' ? 'Link copied!' : copyLinkState === 'error' ? 'Copy failed' : 'Copy shareable link'}
           >
-            {copyLinkSuccess ? <CheckCircle className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5 text-gray-600" />}
+            {copyLinkState === 'success' && <CheckCircle className="w-5 h-5 text-green-600" />}
+            {copyLinkState === 'error'   && <AlertCircle className="w-5 h-5 text-red-500" />}
+            {copyLinkState === 'idle'    && <Copy className="w-5 h-5 text-gray-600" />}
           </button>
 
           <button onClick={handleDownloadMarkdown} className="flex items-center gap-1 px-3 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-sm text-gray-600" title="Download Markdown Report">
@@ -497,7 +513,7 @@ const ScanHistory = ({ scanHistory, onRescan, onToggleFavorite, onLoadFromHistor
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setShowDropdown(prev => !prev)}
-        aria-haspopup="listbox"
+        aria-haspopup="true"
         aria-expanded={showDropdown}
         className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
@@ -528,12 +544,14 @@ const ScanHistory = ({ scanHistory, onRescan, onToggleFavorite, onLoadFromHistor
                     <button
                       onClick={() => { onLoadFromHistory(scan); setShowDropdown(false); }}
                       className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                      aria-label={`Load ${scan.contractName}`}
                     >
                       Load
                     </button>
                     <button
                       onClick={() => { onRescan(scan); setShowDropdown(false); }}
                       className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                      aria-label={`Re-scan ${scan.contractName}`}
                     >
                       Re-scan
                     </button>
@@ -854,9 +872,11 @@ export default function App() {
         date:     new Date().toLocaleString(),
         favorite: false
       };
-      const updatedHistory = [newScan, ...scanHistory].slice(0, 10);
-      setScanHistory(updatedHistory);
-      safeLocalStorageSet('scan_history', JSON.stringify(updatedHistory));
+      setScanHistory(prev => {
+        const updated = [newScan, ...prev].slice(0, 10);
+        safeLocalStorageSet('scan_history', JSON.stringify(updated));
+        return updated;
+      });
       setCurrentPage('results');
     } catch (err) {
       setError('Scan failed: ' + err.message);
@@ -864,7 +884,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, [scanHistory]);
+  }, []);
 
   const handleRescan = useCallback(async (scan) => {
     if (!scan.contractCode) {
