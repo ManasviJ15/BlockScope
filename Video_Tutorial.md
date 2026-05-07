@@ -109,6 +109,16 @@ Open `http://localhost:8000/docs` and use the Swagger UI to run scans and fetch 
 
 ---
 
+## Screenshots
+
+ [Frontend Home Page](https://drive.google.com/file/d/1s5m4S3NYoRJLA82GKVsPpDrkrDOwm_td/view?usp=sharing)  
+ [Scan History](https://drive.google.com/file/d/1z-B7ofjS7gkgInrbnvH6IOLftNLQX7_q/view?usp=sharing)  
+ [Health Endpoint](https://drive.google.com/file/d/1eJPyglcQ2DY0aFiGt93O3ghGDedONBgS/view?usp=sharing)  
+ [Scan result of contract with no vulnerabilities](https://drive.google.com/file/d/16Lz9u3-_qYdNnlkiHYenbY7NM3UYazdS/view?usp=sharing)  
+ [Scan result of contract with vulnerabilities](https://drive.google.com/file/d/1AE2IVQDrFWG7txtqXjGKUu-hZtyh2--L/view?usp=sharing)
+
+---
+
 ## Further Reading
 
 - [`README.md`](README.md) — Full setup and run guide
