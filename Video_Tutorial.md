@@ -25,7 +25,7 @@ Before watching or following along, make sure you have:
 - Frontend available at `http://localhost:5173`
 - Backend available at `http://localhost:8000`
 
-> For non-Docker setup, you'll also need Python 3.11 and Node.js 20+. See [`README.md`](README.md) for details.
+> For a non-Docker setup, you will also need Python 3.11 and Node.js 20+. See [`README.md`](README.md) for details.
 
 ---
 
@@ -48,7 +48,7 @@ Before watching or following along, make sure you have:
 ### 🔍 Dual Analysis Engine
 BlockScope runs two layers of analysis on every scan:
 - **Slither static analysis** — industry-standard Solidity vulnerability detection
-- **Custom source-rule detection** — fallback rules for cases Slither doesn't cover
+- **Custom source-rule detection** — fallback rules for cases Slither does not cover
 
 ### 📊 Security Scoring
 Every scan produces:
@@ -74,7 +74,7 @@ BlockScope exposes a documented FastAPI backend:
 ### ⚙️ Operational Reliability
 - **Health endpoint** at `/health` — reports database and Redis status
 - **Redis-backed rate limiting and caching**
-- **Dockerized stack** — one command brings up frontend, backend, PostgreSQL, and Redis
+- **Dockerized stack** — one command brings up the frontend, backend, PostgreSQL, and Redis
 - **GitHub Actions CI** for backend, frontend, and Docker builds
 
 ---
@@ -92,11 +92,11 @@ curl http://localhost:8000/health
 ```
 
 ### 2. Open the Frontend
-Navigate to `http://localhost:5173`. If the UI looks stale, do a hard refresh (`Ctrl + Shift + R`).
+Navigate to `http://localhost:5173`. If the UI appears outdated, do a hard refresh (`Ctrl+Shift+R`) to clear the browser cache.
 
 ### 3. Run Your First Scan
 - Paste a Solidity contract into the editor, **or** upload a `.sol` file
-- Hit **Scan** and wait for results
+- Click **Scan** and wait for results
 - Review the security score, severity breakdown, and individual findings
 
 ### 4. Explore Scan History
@@ -109,11 +109,15 @@ Open `http://localhost:8000/docs` and use the Swagger UI to run scans and fetch 
 
 ## Screenshots
 
- [Frontend Home Page](https://drive.google.com/file/d/1s5m4S3NYoRJLA82GKVsPpDrkrDOwm_td/view?usp=sharing)  
- [Scan History](https://drive.google.com/file/d/1z-B7ofjS7gkgInrbnvH6IOLftNLQX7_q/view?usp=sharing)  
- [Health Endpoint](https://drive.google.com/file/d/1eJPyglcQ2DY0aFiGt93O3ghGDedONBgS/view?usp=sharing)  
- [Scan result of contract with no vulnerabilities](https://drive.google.com/file/d/16Lz9u3-_qYdNnlkiHYenbY7NM3UYazdS/view?usp=sharing)  
- [Scan result of contract with vulnerabilities](https://drive.google.com/file/d/1AE2IVQDrFWG7txtqXjGKUu-hZtyh2--L/view?usp=sharing)
+**Frontend Home Page** — [View Screenshot](https://drive.google.com/file/d/1s5m4S3NYoRJLA82GKVsPpDrkrDOwm_td/view?usp=sharing)
+
+**Scan History** — [View Screenshot](https://drive.google.com/file/d/1z-B7ofjS7gkgInrbnvH6IOLftNLQX7_q/view?usp=sharing)
+
+**Health Endpoint** — [View Screenshot](https://drive.google.com/file/d/1eJPyglcQ2DY0aFiGt93O3ghGDedONBgS/view?usp=sharing)
+
+**Scan Result — No Vulnerabilities** — [View Screenshot](https://drive.google.com/file/d/16Lz9u3-_qYdNnlkiHYenbY7NM3UYazdS/view?usp=sharing)
+
+**Scan Result — Vulnerabilities Detected** — [View Screenshot](https://drive.google.com/file/d/1AE2IVQDrFWG7txtqXjGKUu-hZtyh2--L/view?usp=sharing)
 
 ---
 
